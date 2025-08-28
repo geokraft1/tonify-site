@@ -1,0 +1,19 @@
+{
+  "name": "tonify",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@alpacamybags118/yt-dlp-exec": "^0.1.1",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "sanitize-html": "^2.17.0"
+  }
+}

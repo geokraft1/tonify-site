@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tonify - Download your favorite videos or music from YouTube, TikTok, Instagram, or Facebook.">
+    <meta name="keywords" content="Tonify, video download, music download, YouTube downloader, TikTok downloader, Instagram downloader, Facebook downloader">
+    <meta property="og:title" content="Tonify - Video and Music Downloader">
+    <meta property="og:description" content="Download videos and music from YouTube, TikTok, Instagram, and Facebook with Tonify!">
+    <meta property="og:type" content="website">
+    <title>Tonify</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.min.js"></script>
+    <script async src="https://www.tiktok.com/embed.js"></script>
+    <script async src="https://www.instagram.com/embed.js"></script>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideInDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes starGlow {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.2); filter: brightness(1.5); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        @keyframes starPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        @keyframes wave {
+            0% { background-position: 200% 0; }
+            100% { background-position: 0 0; }
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
+            50% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.8), 0 0 25px rgba(0, 255, 255, 0.4); }
+            100% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
+        }
+        @keyframes percentagePop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .animate-fadeIn { animation: fadeIn 0.5s ease-out; }
+        .animate-slideInDown { animation: slideInDown 0.5s ease-out; }
+        .animate-slideInRight { animation: slideInRight 0.5s ease-out; }
+        .animate-slideInUp { animation: slideInUp 0.5s ease-out; }
+        .animate-starGlow { animation: starGlow 0.3s ease-in-out; }
+        .animate-starPop { animation: starPop 0.2s ease-in-out; }
+        .animate-wave {
+            animation: wave 3s linear infinite;
+            background: linear-gradient(to right, #10B981 0%, #06B6D4 50%, #3B82F6 100%);
+            background-size: 200% 100%;
+        }
+        .animate-glow { animation: glow 2s ease-in-out infinite; }
+        .animate-percentagePop { animation: percentagePop 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-indigo-900 font-sans min-h-screen flex items-center justify-center">
+    <div id="fb-root"></div>
+    <div class="container mx-auto p-4 max-w-4xl">
+        <!-- Navigation Bar -->
+        <nav class="bg-gradient-to-r from-indigo-800 to-purple-800 text-white p-4 rounded-xl shadow-lg mb-4 animate-slideInDown">
+            <ul class="flex justify-center space-x-6 flex-wrap">
+                <li><a href="#" class="hover:text-cyan-300 transition duration-300 transform hover:scale-110" data-i18n="navHome" data-section="home" aria-label="Home">Home</a></li>
+                <li><a href="#" class="hover:text-cyan-300 transition duration-300 transform hover:scale-110" data-i18n="navContact" data-section="contact" aria-label="Contact">Contact</a></li>
+                <li><a href="#" class="hover:text-cyan-300 transition duration-300 transform hover:scale-110" data-i18n="navCopyright" data-section="copyright" aria-label="Copyright Claims">Copyright Claims</a></li>
+                <li><a href="#" class="hover:text-cyan-300 transition duration-300 transform hover:scale-110" data-i18n="navPrivacy" data-section="privacy" aria-label="Privacy Policy">Privacy Policy</a></li>
+                <li><a href="#" class="hover:text-cyan-300 transition duration-300 transform hover:scale-110" data-i18n="navToU" data-section="tou" aria-label="Terms of Use">Terms of Use</a></li>
+                <li><a href="#" class="hover:text-cyan-300 transition duration-300 transform hover:scale-110" data-i18n="navFAQ" data-section="faq" aria-label="Frequently Asked Questions">Frequently Asked Questions</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div id="mainContent" class="animate-fadeIn">
+            <!-- Header -->
+            <header class="bg-gradient-to-r from-indigo-700 to-purple-700 text-white p-8 rounded-xl shadow-lg text-center transform hover:scale-105 transition duration-300">
+                <h1 class="text-4xl font-bold" data-i18n="title">Tonify</h1>
+                <p class="mt-3 text-lg" data-i18n="subtitle">Paste a URL, preview, and download your favorite videos or music from YouTube, TikTok, Instagram, or Facebook!</p>
+            </header>
+
+            <!-- Download Form -->
+            <div class="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg mx-auto animate-fadeIn">
+                <div class="space-y-6">
+                    <div>
+                        <label for="urlInput" class="block text-sm font-medium text-gray-100" data-i18n="urlLabel">Paste the URL of a video or music</label>
+                        <input
+                            type="text"
+                            id="urlInput"
+                            placeholder="e.g., https://www.youtube.com/watch?v=..."
+                            class="mt-1 block w-full p-3 border border-gray-700 rounded-lg bg-gray-900 text-gray-100 placeholder-gray-400"
+                            aria-label="Paste URL"
+                        >
+                    </div>
+                    <div>
+                        <label for="formatSelect" class="block text-sm font-medium text-gray-100" data-i18n="formatLabel">Select format</label>
+                        <select id="formatSelect" class="mt-1 block w-full p-3 border border-gray-700 rounded-lg bg-gray-900 text-gray-100">
+                            <option value="mp3" data-i18n="formatMp3">MP3 (audio)</option>
+                            <option value="mp4" data-i18n="formatMp4">MP4 (video)</option>
+                        </select>
+                    </div>
+                    <div id="previewSection" class="hidden mt-4 animate-slideInUp">
+                        <h3 class="text-lg font-semibold text-gray-100" data-i18n="previewLabel">Preview:</h3>
+                        <p class="mt-2 text-sm text-gray-200" data-i18n="previewText">Check the content and then download.</p>
+                        <div id="previewEmbed" class="aspect-w-16 aspect-h-9 bg-gray-700 rounded-lg overflow-hidden"></div>
+                    </div>
+                    <div id="fileSizeSection" class="hidden">
+                        <p id="fileSizeEstimate" class="mt-2 text-sm text-gray-200"></p>
+                    </div>
+                    <button
+                        type="button"
+                        id="previewButton"
+                        class="w-full bg-gradient-to-r from-cyan-500 to-indigo-500 text-white p-3 rounded-lg hover:from-cyan-600 hover:to-indigo-600 transition duration-300"
+                        data-i18n="previewButton"
+                        aria-label="Preview video"
+                    >
+                        Preview
+                    </button>
+                    <button
+                        type="button"
+                        id="downloadButton"
+                        class="w-full bg-gradient-to-r from-cyan-500 to-indigo-500 text-white p-3 rounded-lg hover:from-cyan-600 hover:to-indigo-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled
+                        data-i18n="downloadButton"
+                        aria-label="Download video or audio"
+                    >
+                        Download
+                    </button>
+                    <div class="flex items-center mt-2">
+                        <div id="progress" class="w-0 h-4 rounded-lg transition-all duration-500 flex-1 animate-wave animate-glow" role="progressbar" aria-label="Download progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        <span id="progressPercentage" class="ml-2 text-sm text-gray-100 font-bold">0%</span>
+                    </div>
+                    <div id="status" class="mt-4 text-center text-sm text-gray-200" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <!-- Rating Section -->
+            <section class="mt-12 bg-gradient-to-r from-gray-800 to-indigo-800 p-8 rounded-xl shadow-md text-center animate-fadeIn">
+                <h2 class="text-2xl font-semibold text-cyan-300" data-i18n="ratingTitle">Rate Tonify!</h2>
+                <p class="mt-3 text-sm text-gray-200" data-i18n="ratingText">Share your feedback. Your rating helps us improve!</p>
+                <div id="ratingStars" class="flex justify-center mt-4 space-x-2">
+                    <svg class="w-8 h-8 text-gray-400 cursor-pointer hover:text-cyan-400 hover:animate-starGlow" data-rating="1" aria-label="Rate 1 star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.51 8.727c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.97z"/></svg>
+                    <svg class="w-8 h-8 text-gray-400 cursor-pointer hover:text-cyan-400 hover:animate-starGlow" data-rating="2" aria-label="Rate 2 stars" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.51 8.727c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.97z"/></svg>
+                    <svg class="w-8 h-8 text-gray-400 cursor-pointer hover:text-cyan-400 hover:animate-starGlow" data-rating="3" aria-label="Rate 3 stars" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.51 8.727c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.97z"/></svg>
+                    <svg class="w-8 h-8 text-gray-400 cursor-pointer hover:text-cyan-400 hover:animate-starGlow" data-rating="4" aria-label="Rate 4 stars" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.51 8.727c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.97z"/></svg>
+                    <svg class="w-8 h-8 text-gray-400 cursor-pointer hover:text-cyan-400 hover:animate-starGlow" data-rating="5" aria-label="Rate 5 stars" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.51 8.727c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.97z"/></svg>
+                </div>
+                <p id="ratingMessage" class="mt-2 text-sm text-gray-200" data-i18n="ratingText"></p>
+            </section>
+
+            <!-- Download History -->
+            <section class="mt-12 bg-gradient-to-r from-gray-800 to-indigo-800 p-8 rounded-xl shadow-md animate-fadeIn">
+                <h2 class="text-2xl font-semibold text-center text-cyan-300" data-i18n="historyTitle">Download History</h2>
+                <p class="mt-3 text-sm text-gray-200" data-i18n="historyText">Here you can see the list of your downloaded files.</p>
+                <ul id="downloadHistory" class="mt-4 space-y-2"></ul>
+                <button id="clearHistory" class="mt-4 bg-gradient-to-r from-red-500 to-red-600 text-white p-2 rounded-lg hover:from-red-600 hover:to-red-700 transition duration-300" data-i18n="clearHistory" aria-label="Clear download history">Clear History</button>
+            </section>
+
+            <!-- Supported Platforms -->
+            <section class="mt-12 animate-fadeIn">
+                <h2 class="text-3xl font-semibold text-center text-cyan-300" data-i18n="platformsTitle">Supported Platforms</h2>
+                <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="bg-gradient-to-br from-red-700 to-red-800 p-6 rounded-xl shadow-md text-center transform hover:scale-110 transition duration-300">
+                        <img src="https://www.youtube.com/favicon.ico" alt="YouTube" class="mx-auto h-16 w-16 rounded-full" loading="lazy" onerror="this.src='https://via.placeholder.com/64?text=YouTube'">
+                        <p class="mt-3 font-semibold text-red-200">YouTube</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-700 to-green-800 p-6 rounded-xl shadow-md text-center transform hover:scale-110 transition duration-300">
+                        <img src="https://www.tiktok.com/favicon.ico" alt="TikTok" class="mx-auto h-16 w-16 rounded-full" loading="lazy" onerror="this.src='https://via.placeholder.com/64?text=TikTok'">
+                        <p class="mt-3 font-semibold text-green-200">TikTok</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-pink-700 to-pink-800 p-6 rounded-xl shadow-md text-center transform hover:scale-110 transition duration-300">
+                        <img src="https://static.cdninstagram.com/rsrc.php/yI/r/VsNE-OHk_8a.png" alt="Instagram" class="mx-auto h-16 w-16 rounded-full" loading="lazy" onerror="this.src='https://via.placeholder.com/64?text=Instagram'">
+                        <p class="mt-3 font-semibold text-pink-200">Instagram</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-700 to-blue-800 p-6 rounded-xl shadow-md text-center transform hover:scale-110 transition duration-300">
+                        <img src="https://www.facebook.com/favicon.ico" alt="Facebook" class="mx-auto h-16 w-16 rounded-full" loading="lazy" onerror="this.src='https://via.placeholder.com/64?text=Facebook'">
+                        <p class="mt-3 font-semibold text-blue-200">Facebook</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Legal Disclaimer -->
+            <section class="mt-12 bg-gradient-to-r from-gray-800 to-indigo-800 p-8 rounded-xl shadow-lg animate-fadeIn">
+                <h2 class="text-2xl font-semibold text-center text-cyan-300" data-i18n="disclaimerTitle">Legal Disclaimer</h2>
+                <p class="mt-3 text-sm text-gray-200" data-i18n="disclaimerText">Please use this service only to download content you have the right to download. We do not support illegal downloading of copyrighted material.</p>
+            </section>
+
+            <!-- Donation Section -->
+            <section class="mt-12 bg-gradient-to-r from-teal-800 to-cyan-800 p-8 rounded-xl shadow-md text-center animate-fadeIn">
+                <h2 class="text-2xl font-semibold text-teal-200" data-i18n="donationTitle">Support Tonify!</h2>
+                <p class="mt-3 text-sm text-gray-200" data-i18n="donationText">Dear users, your support helps us make Tonify more reliable and user-friendly!</p>
+                <a href="https://buymeacoffee.com/Tonify" target="_blank" class="inline-block mt-4 bg-gradient-to-r from-teal-500 to-cyan-500 text-white p-3 rounded-lg hover:from-teal-600 hover:to-cyan-600 transition duration-300" data-i18n="donationButton" aria-label="Support Tonify">Support</a>
+            </section>
+
+            <!-- Footer -->
+            <footer class="mt-12 bg-gradient-to-r from-indigo-800 to-purple-800 text-white p-6 text-center rounded-xl shadow-md animate-fadeIn">
+                <p data-i18n="footer">&copy; 2025 Tonify. All rights reserved.</p>
+            </footer>
+        </div>
+
+        <!-- Section Content -->
+        <div id="sectionContent" class="hidden bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg mx-auto animate-fadeIn">
+            <h2 id="sectionTitle" class="text-2xl font-semibold text-cyan-300 mb-4"></h2>
+            <p id="sectionText" class="text-gray-200"></p>
+            <button id="backToHome" class="mt-6 bg-gradient-to-r from-cyan-500 to-indigo-500 text-white p-2 rounded-lg hover:from-cyan-600 hover:to-indigo-600 transition duration-300" data-i18n="navHome" aria-label="Return to Home">Home</button>
+        </div>
+    </div>
+
+    <script>
+        // Base URL for backend
+        const BASE_URL = 'http://localhost:3000';
+
+        // Translation object
+        const translations = {
+            en: {
+                title: "Tonify",
+                subtitle: "Paste a URL, preview, and download your favorite videos or music from YouTube, TikTok, Instagram, or Facebook!",
+                urlLabel: "Paste the URL of a video or music",
+                previewLabel: "Preview:",
+                previewText: "Check the content and then download.",
+                formatLabel: "Select format",
+                formatMp3: "MP3 (audio)",
+                formatMp4: "MP4 (video)",
+                previewButton: "Preview",
+                downloadButton: "Download",
+                fileSizeEstimate: "Estimated size: ~{size} MB",
+                fileSizeUnavailable: "File size estimation unavailable",
+                platformsTitle: "Supported Platforms",
+                disclaimerTitle: "Legal Disclaimer",
+                disclaimerText: "Please use this service only to download content you have the right to download. We do not support illegal downloading of copyrighted material.",
+                donationTitle: "Support Tonify!",
+                donationText: "Dear users, your support helps us make Tonify more reliable and user-friendly!",
+                donationButton: "Support",
+                footer: "&copy; 2025 Tonify. All rights reserved.",
+                invalidUrl: "Please enter a valid URL from YouTube, TikTok, Instagram, or Facebook.",
+                previewError: "Failed to load preview: {error}",
+                downloadError: "Download error: {error}",
+                downloadSuccess: "Successfully downloaded! File: {file}",
+                downloading: "Downloading...",
+                downloadComplete: "Download complete!",
+                ratingTitle: "Rate Tonify!",
+                ratingText: "Share your feedback. Your rating helps us improve!",
+                ratingThanks: "Thank you for your rating!",
+                historyTitle: "Download History",
+                historyText: "Here you can see the list of your downloaded files.",
+                clearHistory: "Clear History",
+                historyEmpty: "History is empty.",
+                historyError: "Error loading history: {error}",
+                navHome: "Home",
+                navContact: "Contact",
+                navCopyright: "Copyright Claims",
+                navPrivacy: "Privacy Policy",
+                navToU: "Terms of Use",
+                navFAQ: "Frequently Asked Questions",
+                contactTitle: "Contact",
+                contactText: "Contact us at: support@tonify.com. Our team will respond within 24-48 hours.",
+                copyrightTitle: "Copyright Claims",
+                copyrightText: "If you believe your content is being used without permission, contact us at: copyright@tonify.com.",
+                privacyTitle: "Privacy Policy",
+                privacyText: "We protect your privacy. We only collect necessary data, such as URLs for history.",
+                touTitle: "Terms of Use",
+                touText: "By using Tonify, you agree to use the service legally.",
+                faqTitle: "Frequently Asked Questions",
+                faqText: "Q: What platforms are supported? A: YouTube, TikTok, Instagram, Facebook."
+            }
+        };
+
+        // User ID for history
+        const userId = localStorage.getItem('userId') || (localStorage.setItem('userId', crypto.randomUUID()), localStorage.getItem('userId'));
+
+        // Language switcher
+        function updateLanguage() {
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute('data-i18n');
+                elem.textContent = translations.en[key] || elem.textContent || 'Missing translation';
+            });
+            document.getElementById('urlInput').placeholder = translations.en.urlLabel || 'e.g., https://www.youtube.com/watch?v=...';
+        }
+
+        // Navigation
+        function setupNavigation() {
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = link.getAttribute('data-section');
+                    const mainContent = document.getElementById('mainContent');
+                    const sectionContent = document.getElementById('sectionContent');
+                    const sectionTitle = document.getElementById('sectionTitle');
+                    const sectionText = document.getElementById('sectionText');
+
+                    if (section === 'home') {
+                        mainContent.classList.remove('hidden');
+                        sectionContent.classList.add('hidden');
+                    } else {
+                        mainContent.classList.add('hidden');
+                        sectionContent.classList.remove('hidden');
+                        sectionTitle.textContent = translations.en[`${section}Title`] || 'Section';
+                        sectionText.textContent = translations.en[`${section}Text`] || 'Content not available.';
+                    }
+                });
+            });
+            document.getElementById('backToHome').addEventListener('click', () => {
+                document.getElementById('mainContent').classList.remove('hidden');
+                document.getElementById('sectionContent').classList.add('hidden');
+            });
+        }
+
+        // File size estimation
+        async function fetchFileSize(url, format) {
+            const status = document.getElementById('status');
+            try {
+                const response = await axios.post(`${BASE_URL}/size`, { url, format }, { timeout: 30000 });
+                if (response.status !== 200) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                const { size } = response.data;
+                if (!size) throw new Error('Size not provided');
+                document.getElementById('fileSizeEstimate').textContent = translations.en.fileSizeEstimate.replace('{size}', size);
+                document.getElementById('fileSizeSection').classList.remove('hidden');
+            } catch (error) {
+                console.error('File size error:', error);
+                status.textContent = translations.en.fileSizeUnavailable;
+                document.getElementById('fileSizeSection').classList.add('hidden');
+            }
+        }
+
+        // Validate URL
+        function isValidUrl(url) {
+            const urlPattern = /^(https?:\/\/)(www\.)?(youtube\.com|youtu\.be|tiktok\.com|instagram\.com|facebook\.com)\/.+$/;
+            return urlPattern.test(url);
+        }
+
+        // Extract YouTube video ID
+        function getYouTubeVideoId(url) {
+            try {
+                const parsedUrl = new URL(url);
+                if (parsedUrl.hostname === 'youtu.be') {
+                    return parsedUrl.pathname.split('/')[1].split('?')[0];
+                }
+                if (parsedUrl.hostname === 'www.youtube.com' || parsedUrl.hostname === 'youtube.com') {
+                    if (parsedUrl.pathname.startsWith('/shorts/')) {
+                        return parsedUrl.pathname.split('/shorts/')[1].split('?')[0];
+                    }
+                    if (parsedUrl.pathname.startsWith('/embed/')) {
+                        return parsedUrl.pathname.split('/embed/')[1].split('?')[0];
+                    }
+                    return parsedUrl.searchParams.get('v');
+                }
+                return null;
+            } catch {
+                return null;
+            }
+        }
+
+        // Extract TikTok video ID
+        function getTikTokVideoId(url) {
+            try {
+                const parsedUrl = new URL(url);
+                if (parsedUrl.hostname === 'www.tiktok.com' || parsedUrl.hostname === 'tiktok.com') {
+                    const match = parsedUrl.pathname.match(/\/video\/(\d+)/);
+                    return match ? match[1] : null;
+                }
+                return null;
+            } catch {
+                return null;
+            }
+        }
+
+        // Extract Instagram post ID
+        function getInstagramPostId(url) {
+            try {
+                const parsedUrl = new URL(url);
+                if (parsedUrl.hostname === 'www.instagram.com' || parsedUrl.hostname === 'instagram.com') {
+                    const match = parsedUrl.pathname.match(/\/p\/([^/]+)/);
+                    return match ? match[1] : null;
+                }
+                return null;
+            } catch {
+                return null;
+            }
+        }
+
+        // Extract Facebook video ID
+        function getFacebookVideoId(url) {
+            try {
+                const parsedUrl = new URL(url);
+                if (parsedUrl.hostname === 'www.facebook.com' || parsedUrl.hostname === 'facebook.com') {
+                    const match = parsedUrl.pathname.match(/\/videos\/(\d+)/) || parsedUrl.searchParams.get('v');
+                    return match ? match[1] || match : null;
+                }
+                return null;
+            } catch {
+                return null;
+            }
+        }
+
+        // Preview video
+        let isPreviewing = false;
+        async function previewVideo() {
+            if (isPreviewing) return;
+            isPreviewing = true;
+
+            const urlInput = document.getElementById('urlInput').value.trim();
+            const status = document.getElementById('status');
+            const previewEmbed = document.getElementById('previewEmbed');
+            const previewSection = document.getElementById('previewSection');
+            const downloadButton = document.getElementById('downloadButton');
+
+            if (!urlInput || !isValidUrl(urlInput)) {
+                status.textContent = translations.en.invalidUrl;
+                previewSection.classList.add('hidden');
+                downloadButton.disabled = true;
+                document.getElementById('fileSizeSection').classList.add('hidden');
+                isPreviewing = false;
+                return;
+            }
+
+            status.textContent = "Loading preview...";
+            previewEmbed.innerHTML = "";
+            previewSection.classList.remove('hidden');
+            downloadButton.disabled = false;
+
+            fetchFileSize(urlInput, document.getElementById('formatSelect').value);
+
+            try {
+                if (urlInput.includes("youtube.com") || urlInput.includes("youtu.be")) {
+                    const videoId = getYouTubeVideoId(urlInput);
+                    if (!videoId) throw new Error("Invalid YouTube URL");
+                    const iframe = document.createElement("iframe");
+                    iframe.src = `https://www.youtube.com/embed/${videoId}`;
+                    iframe.allow = "encrypted-media; picture-in-picture";
+                    iframe.className = "w-full h-full rounded-lg";
+                    iframe.loading = "lazy";
+                    previewEmbed.appendChild(iframe);
+                    status.textContent = "";
+                } else if (urlInput.includes("tiktok.com")) {
+                    const videoId = getTikTokVideoId(urlInput);
+                    if (!videoId) throw new Error("Invalid TikTok URL");
+                    const blockquote = document.createElement("blockquote");
+                    blockquote.className = "tiktok-embed";
+                    blockquote.setAttribute("cite", urlInput);
+                    blockquote.setAttribute("data-video-id", videoId);
+                    blockquote.style = "width: 100%; max-width: 605px; min-width: 325px;";
+                    const section = document.createElement("section");
+                    blockquote.appendChild(section);
+                    previewEmbed.appendChild(blockquote);
+                    window.tiktokEmbeds?.init?.();
+                    status.textContent = "";
+                } else if (urlInput.includes("instagram.com")) {
+                    const postId = getInstagramPostId(urlInput);
+                    if (!postId) throw new Error("Invalid Instagram URL");
+                    const blockquote = document.createElement("blockquote");
+                    blockquote.className = "instagram-media";
+                    blockquote.setAttribute("data-instgrm-permalink", urlInput);
+                    blockquote.setAttribute("data-instgrm-version", "14");
+                    blockquote.style = "width: 100%; max-width: 540px;";
+                    const div = document.createElement("div");
+                    div.style = "padding: 16px;";
+                    blockquote.appendChild(div);
+                    previewEmbed.appendChild(blockquote);
+                    window.instgrm?.Embeds?.process?.();
+                    status.textContent = "";
+                } else if (urlInput.includes("facebook.com")) {
+                    const videoId = getFacebookVideoId(urlInput);
+                    if (!videoId) throw new Error("Invalid Facebook URL");
+                    const div = document.createElement("div");
+                    div.className = "fb-video";
+                    div.setAttribute("data-href", urlInput);
+                    div.setAttribute("data-width", "500");
+                    div.setAttribute("data-show-text", "false");
+                    previewEmbed.appendChild(div);
+                    window.FB?.XFBML?.parse?.();
+                    status.textContent = "";
+                } else {
+                    throw new Error("Unsupported platform");
+                }
+            } catch (err) {
+                console.error('Preview error:', err);
+                status.textContent = translations.en.previewError.replace('{error}', err.message || 'Unable to load preview');
+                previewSection.classList.add('hidden');
+                downloadButton.disabled = true;
+                document.getElementById('fileSizeSection').classList.add('hidden');
+            } finally {
+                isPreviewing = false;
+            }
+        }
+
+        // Download with progress
+        function startDownload() {
+            const urlInput = document.getElementById("urlInput").value.trim();
+            const format = document.getElementById("formatSelect").value;
+            const status = document.getElementById("status");
+            const progress = document.getElementById("progress");
+            const progressPercentage = document.getElementById("progressPercentage");
+            const downloadButton = document.getElementById("downloadButton");
+
+            if (!urlInput || !isValidUrl(urlInput)) {
+                status.textContent = translations.en.invalidUrl;
+                return;
+            }
+
+            downloadButton.disabled = true;
+            status.textContent = translations.en.downloading;
+            progress.style.width = "0%";
+            progressPercentage.textContent = "0%";
+            progress.setAttribute("aria-valuenow", 0);
+
+            const eventSource = new EventSource(`${BASE_URL}/api/download?url=${encodeURIComponent(urlInput)}&format=${format}`);
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.progress) {
+                    const progressValue = Math.min(data.progress, 100);
+                    progress.style.width = `${progressValue}%`;
+                    progressPercentage.textContent = `${progressValue}%`;
+                    progress.setAttribute("aria-valuenow", progressValue);
+                    progressPercentage.classList.add('animate-percentagePop');
+                    setTimeout(() => progressPercentage.classList.remove('animate-percentagePop'), 300);
+                } else if (data.status === 'completed' && data.file) {
+                    status.textContent = translations.en.downloadComplete;
+                    let downloads = JSON.parse(localStorage.getItem("downloads") || "[]");
+                    downloads = downloads.slice(-49); // Limit to last 50 downloads
+                    downloads.push(data.file);
+                    localStorage.setItem("downloads", JSON.stringify(downloads));
+                    loadHistory();
+
+                    const link = document.createElement("a");
+                    link.href = `${BASE_URL}${data.file}`;
+                    link.download = data.file.split('/').pop();
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    downloadButton.disabled = false;
+                    eventSource.close();
+                } else if (data.error) {
+                    status.textContent = translations.en.downloadError.replace('{error}', data.error);
+                    downloadButton.disabled = false;
+                    eventSource.close();
+                }
+            };
+            eventSource.onerror = () => {
+                status.textContent = translations.en.downloadError.replace('{error}', 'Connection to server lost');
+                downloadButton.disabled = false;
+                eventSource.close();
+            };
+        }
+
+        // Load download history
+        function loadHistory() {
+            const historyList = document.getElementById("downloadHistory");
+            const downloads = JSON.parse(localStorage.getItem("downloads") || "[]");
+            historyList.innerHTML = "";
+
+            if (downloads.length === 0) {
+                historyList.innerHTML = `<li class="text-gray-400">${translations.en.historyEmpty}</li>`;
+                return;
+            }
+
+            downloads.forEach(file => {
+                const li = document.createElement("li");
+                li.textContent = file;
+                li.className = "text-gray-200";
+                historyList.appendChild(li);
+            });
+        }
+
+        // Clear history
+        function clearHistory() {
+            localStorage.removeItem("downloads");
+            loadHistory();
+        }
+
+        // Rating system
+        function setRating(rating) {
+            const stars = document.querySelectorAll('#ratingStars svg');
+            stars.forEach(star => {
+                const starRating = parseInt(star.getAttribute('data-rating'));
+                star.classList.toggle('text-cyan-400', starRating <= rating);
+                star.classList.toggle('text-gray-400', starRating > rating);
+                if (starRating <= rating) {
+                    star.classList.add('animate-starPop');
+                    star.addEventListener('animationend', () => {
+                        star.classList.remove('animate-starPop');
+                    }, { once: true });
+                }
+            });
+            document.getElementById('ratingMessage').textContent = translations.en.ratingThanks;
+        }
+
+        // Debounce function
+        function debounce(fn, delay) {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn(...args), delay);
+            };
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('previewButton').addEventListener('click', previewVideo);
+            document.getElementById('downloadButton').addEventListener('click', startDownload);
+            document.getElementById('clearHistory').addEventListener('click', clearHistory);
+            document.getElementById('urlInput').addEventListener('input', debounce(() => {
+                document.getElementById('previewSection').classList.add('hidden');
+                document.getElementById('downloadButton').disabled = true;
+                document.getElementById('fileSizeSection').classList.add('hidden');
+                document.getElementById('status').textContent = "";
+            }, 300));
+            document.querySelectorAll('#ratingStars svg').forEach(star => {
+                star.addEventListener('click', () => setRating(parseInt(star.getAttribute('data-rating'))));
+            });
+            setupNavigation();
+            updateLanguage();
+            loadHistory();
+            document.getElementById('ratingMessage').textContent = translations.en.ratingText;
+        });
+    </script>
+</body>
+</html>
