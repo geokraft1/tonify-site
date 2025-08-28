@@ -6,10 +6,10 @@ const createYtDlpAsProcess = require('@alpacamybags118/yt-dlp-exec');
 const sanitizeHtml = require('sanitize-html');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000; // Use Render's PORT or fallback to 3000
 
 // Middleware
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: ['http://localhost:3000', 'https://tonify-di49.onrender.com'] }));
 app.use(express.json());
 app.use('/downloads', express.static(path.join(__dirname, 'downloads')));
 
@@ -81,7 +81,8 @@ app.post('/size', async (req, res) => {
     };
     // Try without cookies first
     let proc = createYtDlpAsProcess(url, options);
-    let { stdout } = await proc.catch(async (err) => {
+    let { stdout, stderr } = await proc.catch(async (err) => {
+      console.error('Size estimation error without cookies:', err.message, stderr || '');
       if (cookies && err.message.includes('Sign in')) {
         console.log('Retrying with cookies...');
         options.cookies = cookies;
@@ -110,7 +111,7 @@ app.post('/size', async (req, res) => {
     const size = (selectedFormat.filesize_approx || selectedFormat.filesize || 0) / (1024 * 1024); // Convert to MB
     res.json({ size: size.toFixed(2) });
   } catch (err) {
-    console.error('Size estimation error:', err);
+    console.error('Size estimation error:', err.message);
     res.status(500).json({ error: err.message || 'Failed to estimate file size. Try checking URL or updating cookies.txt.' });
   }
 });
@@ -135,7 +136,8 @@ app.post('/get-video-url', async (req, res) => {
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     };
     let proc = createYtDlpAsProcess(url, options);
-    let { stdout } = await proc.catch(async (err) => {
+    let { stdout, stderr } = await proc.catch(async (err) => {
+      console.error('Video URL error without cookies:', err.message, stderr || '');
       if (cookies && err.message.includes('Sign in')) {
         console.log('Retrying with cookies...');
         options.cookies = cookies;
@@ -150,7 +152,7 @@ app.post('/get-video-url', async (req, res) => {
     }
     res.json({ videoUrl });
   } catch (err) {
-    console.error('Video URL error:', err);
+    console.error('Video URL error:', err.message);
     res.status(500).json({ error: err.message || 'Failed to retrieve video URL. Try checking URL or updating cookies.txt.' });
   }
 });
@@ -189,6 +191,10 @@ app.get('/api/download', async (req, res) => {
     f: ytFormat,
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
   };
+  if (format === 'mp3') {
+    options.extractAudio = true;
+    options.audioFormat = 'mp3';
+  }
 
   try {
     // Try download without cookies first
@@ -206,10 +212,14 @@ app.get('/api/download', async (req, res) => {
                      line.match(/\[download\]\s*(\d+\.\d+)%/i);
         if (match) {
           const progress = parseFloat(match[1]);
-          console.log(`Progress: ${progress}%`); // Debug log
+          console.log(`Progress: ${progress}%`);
           res.write(`data: ${JSON.stringify({ progress })}\n\n`);
         }
       }
+    });
+
+    proc.stderr.on('data', (chunk) => {
+      console.error('yt-dlp stderr:', chunk.toString());
     });
 
     proc.on('error', async (err) => {
@@ -229,10 +239,14 @@ app.get('/api/download', async (req, res) => {
                          line.match(/\[download\]\s*(\d+\.\d+)%/i);
             if (match) {
               const progress = parseFloat(match[1]);
-              console.log(`Progress (with cookies): ${progress}%`); // Debug log
+              console.log(`Progress (with cookies): ${progress}%`);
               res.write(`data: ${JSON.stringify({ progress })}\n\n`);
             }
           }
+        });
+
+        proc.stderr.on('data', (chunk) => {
+          console.error('yt-dlp stderr (with cookies):', chunk.toString());
         });
 
         proc.on('close', async (code) => {
@@ -245,12 +259,12 @@ app.get('/api/download', async (req, res) => {
         });
 
         proc.on('error', (err) => {
-          console.error('Download error with cookies:', err);
+          console.error('Download error with cookies:', err.message);
           res.write(`data: ${JSON.stringify({ error: err.message || 'Download process error with cookies.' })}\n\n`);
           res.end();
         });
       } else {
-        console.error('Download error:', err);
+        console.error('Download error:', err.message);
         res.write(`data: ${JSON.stringify({ error: err.message || 'Download process error. Try checking URL.' })}\n\n`);
         res.end();
       }
@@ -263,12 +277,12 @@ app.get('/api/download', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Download initialization error:', err);
+    console.error('Download initialization error:', err.message);
     res.write(`data: ${JSON.stringify({ error: err.message || 'Failed to start download. Try checking URL.' })}\n\n`);
     res.end();
   }
 });
 
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+  console.log(`Server running on port ${port}`);
 });
